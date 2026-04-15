@@ -1,40 +1,101 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# Canada Trivia Generator
 
-## Getting Started
+A fullstack SaaS app that streams AI-generated Canadian history trivia to authenticated users in real time.
 
-First, run the development server:
+## Tech Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Frontend:** Next.js 16 (Pages Router), React 19, Tailwind CSS 4
+- **Auth:** Clerk
+- **Backend:** FastAPI (Python) — serverless function at `api/index.py`
+- **AI:** OpenAI API with streaming
+- **Streaming:** Server-Sent Events (SSE)
+- **Deployment:** Vercel
+
+## Project Structure
+
+```
+saas/
+├── api/
+│   └── index.py          # FastAPI backend — /api, SSE streaming, Clerk JWT auth
+├── pages/
+│   ├── _app.tsx          # ClerkProvider
+│   ├── _document.tsx     # <head> / meta tags
+│   ├── index.tsx         # Landing + sign-in page
+│   └── product.tsx       # Authenticated product page (SSE consumer)
+├── styles/
+│   └── globals.css       # Tailwind + markdown/prose styles
+└── requirements.txt      # Python dependencies
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Local Development
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+### Prerequisites
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+- Node.js 18+
+- Python 3.10+
+- A [Clerk](https://clerk.com) account
+- An OpenAI API key
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+### Setup
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **Install dependencies**
 
-## Learn More
+   ```bash
+   npm install
+   pip install -r requirements.txt
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+2. **Configure environment variables**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+   Create a `.env.local` file at the project root:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+   ```env
+   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+   CLERK_SECRET_KEY=sk_test_...
+   CLERK_JWKS_URL=https://<your-clerk-domain>/.well-known/jwks.json
+   OPENAI_API_KEY=sk-...
+   ```
 
-## Deploy on Vercel
+3. **Run the dev server**
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+   Use the Vercel CLI for the most accurate local environment (runs Next.js + FastAPI together):
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+   ```bash
+   vercel dev
+   ```
+
+   Or run them separately:
+
+   ```bash
+   # Terminal 1 — Next.js
+   npm run dev
+
+   # Terminal 2 — FastAPI
+   uvicorn api.index:app --reload
+   ```
+
+4. Open [http://localhost:3000](http://localhost:3000)
+
+## How It Works
+
+1. User signs in via Clerk on the landing page.
+2. On the product page, the frontend requests a Clerk JWT and opens an SSE connection to `GET /api` with an `Authorization: Bearer <token>` header.
+3. The FastAPI backend validates the JWT, extracts the user ID, and streams an OpenAI response chunk-by-chunk back to the client.
+4. The frontend renders each chunk as it arrives using `react-markdown`.
+
+## Deployment
+
+This project is deployed on Vercel.
+
+- The Next.js frontend is deployed automatically on push to `main`.
+- `api/index.py` is automatically detected by Vercel as a Python serverless function — no extra configuration required.
+- Add all environment variables in the Vercel project dashboard under **Settings → Environment Variables**.
+
+## Available Scripts
+
+```bash
+npm run dev      # Start Next.js development server
+npm run build    # Production build
+npm run start    # Start production server
+npm run lint     # Run ESLint
+```

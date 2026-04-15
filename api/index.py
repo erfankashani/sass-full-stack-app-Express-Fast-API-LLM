@@ -20,7 +20,7 @@ def idea(creds: HTTPAuthorizationCredentials = Depends(clerk_guard)):
     
     client = OpenAI()
     prompt = [{"role": "user", "content": "Look up today's date and come up with a historical trivia about canada for students based on todays date. do not ask clarifying questions. formatted with headings, sub-headings and bullet points."}]
-    stream = client.chat.completions.create(model="gpt-5-nano", messages=prompt, stream=True)
+    stream = client.chat.completions.create(model="gpt-5.4-nano", messages=prompt, stream=True)
 
     def event_stream():
         for chunk in stream:

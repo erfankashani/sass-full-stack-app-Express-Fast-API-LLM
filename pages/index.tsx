@@ -1,66 +1,62 @@
-"use client"
-
 import Link from 'next/link';
-import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
+import { useRouter } from 'next/router';
+import { SignedIn, SignedOut, SignInButton, UserButton, useAuth, useClerk } from '@clerk/nextjs';
+import Hero from '@/components/ui/animated-shader-hero';
 
 export default function Home() {
-  return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
-      <div className="container mx-auto px-4 py-12">
-        {/* Navigation */}
-        <nav className="flex justify-between items-center mb-12">
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
-            TriviaGen
-          </h1>
-          <div>
-            <SignedOut>
-              <SignInButton mode="modal">
-                <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors">
-                  Sign In
-                </button>
-              </SignInButton>
-            </SignedOut>
-            <SignedIn>
-              <div className="flex items-center gap-4">
-                <Link 
-                  href="/product" 
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors"
-                >
-                  Go to App
-                </Link>
-                <UserButton afterSignOutUrl="/" />
-              </div>
-            </SignedIn>
-          </div>
-        </nav>
+  const { isSignedIn } = useAuth();
+  const { openSignIn } = useClerk();
+  const router = useRouter();
 
-        {/* Hero Section */}
-        <div className="text-center py-24">
-          <h2 className="text-6xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-6">
-            Generate Your Next
-            <br />
-            Canadian Trivia Idea
-          </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-400 mb-12 max-w-2xl mx-auto">
-            Harness the power of AI to discover innovative historical trivia tailored for today
-          </p>
-          
+  const handlePrimaryClick = () => {
+    if (isSignedIn) {
+      router.push('/product');
+    } else {
+      openSignIn();
+    }
+  };
+
+  return (
+    <>
+      {/* Floating navigation — sits above the full-screen Hero */}
+      <nav className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-6 py-4">
+        <span className="text-white font-bold text-xl drop-shadow">TriviaGen</span>
+        <div>
           <SignedOut>
             <SignInButton mode="modal">
-              <button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-4 px-8 rounded-xl text-lg transition-all transform hover:scale-105">
-                Get Started Free
+              <button className="bg-orange-500/10 hover:bg-orange-500/20 border border-orange-300/30 hover:border-orange-300/50 text-orange-100 font-medium py-2 px-5 rounded-full transition-all backdrop-blur-sm text-sm">
+                Sign In
               </button>
             </SignInButton>
           </SignedOut>
           <SignedIn>
-            <Link href="/product">
-              <button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-4 px-8 rounded-xl text-lg transition-all transform hover:scale-105">
-                Generate Trivia Now
-              </button>
-            </Link>
+            <div className="flex items-center gap-3">
+              <Link
+                href="/product"
+                className="bg-orange-500/10 hover:bg-orange-500/20 border border-orange-300/30 text-orange-100 font-medium py-2 px-5 rounded-full transition-all backdrop-blur-sm text-sm"
+              >
+                Go to App
+              </Link>
+              <UserButton afterSignOutUrl="/" />
+            </div>
           </SignedIn>
         </div>
-      </div>
-    </main>
+      </nav>
+
+      <Hero
+        trustBadge={{ text: "AI-Powered Canadian History", icons: ["✨"] }}
+        headline={{
+          line1: "Generate Your Next",
+          line2: "Canadian Trivia Idea",
+        }}
+        subtitle="Harness the power of AI to discover innovative historical trivia tailored for today"
+        buttons={{
+          primary: {
+            text: isSignedIn ? "Generate Trivia Now" : "Get Started Free",
+            onClick: handlePrimaryClick,
+          },
+        }}
+      />
+    </>
   );
 }
