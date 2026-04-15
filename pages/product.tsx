@@ -114,29 +114,29 @@ export default function Product() {
 
 
     return (
-        <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+        <main className="min-h-screen">
             <div className="container mx-auto px-4 py-12">
                 {/* Header */}
                 <header className="text-center mb-12">
-                    <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-4">
+                    <h1 className="text-5xl font-bold bg-gradient-to-r from-orange-300 via-yellow-400 to-amber-300 bg-clip-text text-transparent mb-4">
                         Canadian History Trivia Generator
                     </h1>
-                    <p className="text-gray-600 dark:text-gray-400 text-lg">
+                    <p className="text-orange-100/70 text-lg">
                         AI-powered Trivia Generator at your fingertips
                     </p>
                 </header>
 
                 {/* Content Card */}
                 <div className="max-w-3xl mx-auto">
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 backdrop-blur-lg bg-opacity-95">
+                    <div className="bg-black/40 border border-orange-300/20 rounded-2xl shadow-xl p-8 backdrop-blur-md">
                         {idea === '…loading' ? (
                             <div className="flex items-center justify-center py-12">
-                                <div className="animate-pulse text-gray-400">
+                                <div className="animate-pulse text-orange-100/50">
                                     Generating your Canadian historical idea...
                                 </div>
                             </div>
                         ) : (
-                            <div className="markdown-content text-gray-700 dark:text-gray-300">
+                            <div className="markdown-content text-orange-50/90">
                                 <ReactMarkdown
                                     remarkPlugins={[remarkGfm, remarkBreaks]}
                                 >
